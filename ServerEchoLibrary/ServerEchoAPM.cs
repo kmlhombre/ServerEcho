@@ -59,7 +59,6 @@ namespace ServerEchoLibrary
                 }
                 catch (IOException e)
                 {
-                    Console.WriteLine(e.Message);
                     break;
                 }
             }
