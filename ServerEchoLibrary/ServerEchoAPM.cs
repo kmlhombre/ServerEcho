@@ -1,4 +1,5 @@
 ﻿using System;
+using System.CodeDom.Compiler;
 using System.Collections.Generic;
 using System.IO;
 using System.Linq;
@@ -24,42 +25,66 @@ namespace ServerEchoLibrary
                 TcpClient tcpClient = TcpListener.AcceptTcpClient();
                 Stream = tcpClient.GetStream();
                 TransmissionDataDelegate transmissionDelegate = new TransmissionDataDelegate(BeginDataTransmission);
-                //callback style
+
                 transmissionDelegate.BeginInvoke(Stream, TransmissionCallback, tcpClient);
-                // async result style
-                //IAsyncResult result = transmissionDelegate.BeginInvoke(Stream, null, null);
-                ////operacje......
-                //while (!result.IsCompleted) ;
-                ////sprzątanie
             }
         }
 
 
         private void TransmissionCallback(IAsyncResult ar)
         {
-            // sprzątanie
+            TcpClient tcpClient = (TcpClient)ar.AsyncState;
+            tcpClient.Close();
         }
         protected override void BeginDataTransmission(NetworkStream stream)
         {
             byte[] buffer = new byte[Buffer_size];
+            byte[] responseBuffer = new byte[Buffer_size];
+
             while (true)
             {
                 try
                 {
-                    int message_size = stream.Read(buffer, 0, Buffer_size);
-                    stream.Write(buffer, 0, message_size);
+                    stream.Read(buffer, 0, Buffer_size);
+
+                    string received = System.Text.Encoding.ASCII.GetString(buffer);
+                    Console.WriteLine(received);
+                    string response = CaesarCipher(received);
+
+                    responseBuffer = System.Text.Encoding.ASCII.GetBytes(response);
+                    stream.Write(responseBuffer, 0, responseBuffer.Length);
+
+                    Array.Clear(buffer, 0, buffer.Length);
+                    Array.Clear(responseBuffer, 0, response.Length);
                 }
                 catch (IOException e)
                 {
+                    Console.WriteLine(e.Message);
                     break;
                 }
             }
         }
         public override void Start()
         {
+            Console.WriteLine("Start serwera");
             StartListening();
             //transmission starts within the accept function
             AcceptClient();
+        }
+
+        protected static string CaesarCipher(string word)
+        {
+            var rand = new Random();
+            // losowanie wartosci przesuniecia
+            int liczba = rand.Next(1, 21);
+            StringBuilder stringBuilder = new StringBuilder(word);
+
+            for(int i=0; i<word.Length; i++)
+            {
+                stringBuilder[i] += (char) liczba;
+            }
+
+            return stringBuilder.ToString();
         }
     }
 }

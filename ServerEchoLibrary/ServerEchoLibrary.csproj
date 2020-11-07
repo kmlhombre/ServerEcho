@@ -43,8 +43,8 @@
     <Reference Include="System.Xml" />
   </ItemGroup>
   <ItemGroup>
+    <Compile Include="MainProgram.cs" />
     <Compile Include="ServerEchoAPM.cs" />
-    <Compile Include="ServerEchoSync.cs" />
     <Compile Include="ServerEcho.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
   </ItemGroup>
