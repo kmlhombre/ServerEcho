@@ -49,6 +49,7 @@ namespace ServerEchoLibrary
 
                     string received = System.Text.Encoding.ASCII.GetString(buffer);
                     Console.WriteLine(received);
+                    //switch case
                     string response = CaesarCipher(received);
 
                     responseBuffer = System.Text.Encoding.ASCII.GetBytes(response);
@@ -84,6 +85,67 @@ namespace ServerEchoLibrary
             }
 
             return stringBuilder.ToString();
+        }
+
+        protected static string DiagonalColumnTranspositionCipherWithKey(string word, string secretKey)
+        {
+            string cipher = "";
+            int rows = (int)Math.Ceiling(word.Length / secretKey.Length * 1.0);
+            int secretKeyLength = secretKey.Length;
+            char[,] array = new char[rows, secretKeyLength];
+            int counter = 0;
+
+            for(int i=0; i<rows; i++)
+            {
+                for(int j=0; j<secretKeyLength; j++)
+                {
+                    if (counter < secretKeyLength)
+                        array[i, j] = word[counter];
+                    else
+                        array[i, j] = 'X';
+                    counter++;
+                    Console.WriteLine(array[i, j]);
+                }
+                Console.WriteLine("\n");
+            }
+
+
+            return cipher;
+        }
+
+        private static int[] getSortedIndex(string input)
+        {
+            int[] indexes = new int[input.Length];
+            char[] characters = input.ToArray();
+            Array.Sort(characters);
+            string sorted = new string(characters);
+            int index = 0;
+
+            for (int i = 0; i < sorted.Length; i++)
+            {
+                for (int j = 0; j < input.Length; j++)
+                {
+                    if (sorted[i] == input[j])
+                    {
+                        index = j;
+                        if (!checkIndex(index, indexes))
+                            break;
+                    }
+                }
+                indexes[i] = index;
+            }
+
+            return indexes;
+        }
+
+        private static bool checkIndex(int index, int[] indexes)
+        {
+            for (int i = 0; i < indexes.Length; i++)
+            {
+                if (index == indexes[i])
+                    return true;
+            }
+            return false;
         }
     }
 }
